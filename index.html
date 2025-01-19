@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Tracker</title>
+    <script>
+        const subjects = ["UMA3276", "UEE3276", "UIT3261", "UCY3276", "UEN3286", "UIT3281", "UGA3276", "UGE3297", "UIT3218", "UGEV302"];
+        const timeSlots = ["8:00-8:45 am", "8:45-9:30 am", "9:50-10:35 am", "10:35-11:20 am", "11:20 am-12:05 pm", "1:05-1:50 pm", "2:10-2:55 pm", "2:55-3:40 pm"];
+
+        function saveAttendance(date) {
+            let attendanceData = JSON.parse(localStorage.getItem("attendance")) || {};
+            attendanceData[date] = {};
+
+            subjects.forEach(subject => {
+                let attended = confirm(`Did you attend ${subject} on ${date}? Click OK for Yes, Cancel for No.`);
+                attendanceData[date][subject] = { total: 1, attended: attended ? 1 : 0 };
+            });
+
+            localStorage.setItem("attendance", JSON.stringify(attendanceData));
+            alert("Attendance saved!");
+        }
+
+        function viewSummary() {
+            let attendanceData = JSON.parse(localStorage.getItem("attendance")) || {};
+            let summary = subjects.map(subject => {
+                let total = 0, attended = 0;
+                for (let date in attendanceData) {
+                    if (attendanceData[date][subject]) {
+                        total += attendanceData[date][subject].total;
+                        attended += attendanceData[date][subject].attended;
+                    }
+                }
+                let percentage = total > 0 ? ((attended / total) * 100).toFixed(2) : 0;
+                return `<p>${subject}: ${attended}/${total} periods attended (${percentage}%)</p>`;
+            }).join("");
+            document.getElementById("summary").innerHTML = summary;
+        }
+    </script>
+</head>
+<body>
+    <h1>Attendance Tracker</h1>
+    <button onclick="saveAttendance(prompt('Enter Date (dd-mm-yyyy):'))">Mark Attendance</button>
+    <button onclick="viewSummary()">View Summary</button>
+    <div id="summary"></div>
+</body>
+</html>
